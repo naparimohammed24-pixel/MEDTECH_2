@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Blog Post</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background:#0b1020; color:white; font-family:Arial; padding:20px }
+    img { max-width:100%; border-radius:8px }
+  </style>
+</head>
+<body>
+
+<a href="blog.html">← Back to blog</a>
+<h1 id="title"></h1>
+<div id="content">Loading...</div>
+
+<script>
+const slug = new URLSearchParams(window.location.search).get("slug");
+
+fetch(`/api/post?slug=${slug}`)
+  .then(res => res.json())
+  .then(data => {
+    if (!data.items.length) {
+      document.getElementById("content").innerText = "Post not found";
+      return;
+    }
+
+    const post = data.items[0].fields;
+
+    document.getElementById("title").innerText = post.title;
+
+    document.getElementById("content").innerHTML =
+      post.content.content
+        .map(b => b.content?.map(t => t.value).join("") || "")
+        .join("<p></p>");
+  })
+  .catch(() => {
+    document.getElementById("content").innerText = "Error loading post";
+  });
+
+</script>
+
+</body>
+</html>
