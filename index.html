@@ -358,6 +358,34 @@ iframe {
   cursor:pointer;
   box-shadow:0 0 15px #00eaff;
   }
+  #blog-section {
+  padding: 40px 20px;
+  background: #0b1020;
+}
+
+.blog-title {
+  color: #00eaff;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.blog-post {
+  background: #111833;
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+}
+
+.blog-post h3 {
+  color: #00eaff;
+  margin-bottom: 10px;
+}
+
+.blog-post video {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 15px;
+    }
 </style>
 </head>
 
@@ -455,6 +483,10 @@ iframe {
   </div>
 </div>
 </section>
+    <section id="blog-section">
+  <h2 class="blog-title">Latest Blog Posts</h2>
+  <div id="blog-container"></div>
+    </section>
     
     <section id="code-studio">
   <h2 class="section-title">🧠 MEDTECH Code Studio</h2>
@@ -842,4 +874,67 @@ if (aiBtn && aiBox) {
     msgBox.innerHTML += `<p style="color:red;">AI failed</p>`;
   }
 }
+  fetch("/api/blog")
+  .then(res => res.json())
+  .then(data => {
+
+    const assets = {};
+    data.includes.Asset.forEach(asset => {
+      assets[asset.sys.id] = asset.fields.file.url;
+    });
+
+    data.items.forEach(post => {
+      const videoId = post.fields.video?.sys.id;
+
+      if (videoId && assets[videoId]) {
+        document.body.innerHTML += `
+          <video controls width="100%">
+            <source src="https:${assets[videoId]}" type="video/mp4">
+          </video>
+        `;
+      }
+    });
+  });
+  
+fetch("/api/blog")
+  .then(res => res.json())
+  .then(data => {
+
+    const container = document.getElementById("blog-container");
+    container.innerHTML = "";
+
+    // Map assets (videos)
+    const assets = {};
+    if (data.includes && data.includes.Asset) {
+      data.includes.Asset.forEach(asset => {
+        assets[asset.sys.id] = asset.fields.file.url;
+      });
+    }
+
+    data.items.forEach(post => {
+      const title = post.fields.title || "Untitled Post";
+
+      let videoHTML = "";
+      if (post.fields.video && assets[post.fields.video.sys.id]) {
+        videoHTML = `
+          <video controls>
+            <source src="https:${assets[post.fields.video.sys.id]}" type="video/mp4">
+          </video>
+        `;
+      }
+
+      container.innerHTML += `
+        <div class="blog-post">
+          <h3>${title}</h3>
+          ${videoHTML}
+        </div>
+        `;
+    });
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("blog-container").innerHTML =
+      "<p>Failed to load blog posts.</p>";
+  });
+
 </script>
