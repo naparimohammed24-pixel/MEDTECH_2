@@ -344,6 +344,20 @@ iframe {
     flex-direction: column;
   }
 }
+  #aiBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#00eaff;
+  color:black;
+  border:none;
+  border-radius:50%;
+  width:60px;
+  height:60px;
+  font-size:24px;
+  cursor:pointer;
+  box-shadow:0 0 15px #00eaff;
+  }
 </style>
 </head>
 
@@ -386,25 +400,13 @@ iframe {
 </a>
 </nav>
   <button id="aiBtn">🤖</button>
+  <input
+  id="aiInput"
+  placeholder="Ask MEDTECH AI..."
+  onkeydown="if(event.key==='Enter'){sendAI()}"
+/>
 <div class="ad-placeholder">🔹 Ad Placeholder 🔹</div>
   <div id="aiBox">
-  
-<style>
-#aiBtn{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#00eaff;
-  color:black;
-  border:none;
-  border-radius:50%;
-  width:60px;
-  height:60px;
-  font-size:24px;
-  cursor:pointer;
-  box-shadow:0 0 15px #00eaff;
-}
-</style>
 
 <!-- ICT SECTION -->
 <section id="ict">
