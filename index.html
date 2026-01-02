@@ -386,6 +386,29 @@ iframe {
   border-radius: 10px;
   margin-top: 15px;
     }
+  #blog-section {
+  padding: 20px;
+  background: #0b1020;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.blog-post {
+  background: #111833;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.blog-post h2 {
+  color: #00eaff;
+  margin-bottom: 10px;
+}
+
+.blog-post video {
+  border-radius: 8px;
+  margin-top: 10px;
+  }
 </style>
 </head>
 
@@ -453,7 +476,13 @@ iframe {
   <div style="background:#1e2440;color:#00ff99;text-align:center;padding:15px;margin:20px 0;border-radius:8px;">
   🔹 Sponsored / Ads not available🔹
 </div>
-
+<section id="blog-section">
+  <h1>📘 Medtech Blog</h1>
+  <a href="index.html">Back to homepage</a>
+  <div id="blog-container">
+    <p id="loading">Loading posts...</p>
+  </div>
+</section>
 <!-- INNOVATION -->
 <section id="innovation">
 <h2 class="section-title">💡 Innovation & Tech Ideas</h2>
@@ -936,5 +965,59 @@ fetch("/api/blog")
     document.getElementById("blog-container").innerHTML =
       "<p>Failed to load blog posts.</p>";
   });
+  
+async function loadBlog() {
+  const container = document.getElementById("blog-container");
+  const loading = document.getElementById("loading");
+  
+  try {
+    const res = await fetch("/api/blog"); // or direct Contentful URL if no API
+    const data = await res.json();
+
+    loading.style.display = "none"; // hide loading text
+
+    // Build asset map for videos
+    const assets = {};
+    if (data.includes && data.includes.Asset) {
+      data.includes.Asset.forEach(asset => {
+        assets[asset.sys.id] = asset.fields.file.url;
+      });
+    }
+
+    // Check if posts exist
+    if (!data.items || data.items.length === 0) {
+      container.innerHTML = "<p>No blog posts found.</p>";
+      return;
+    }
+
+    // Render each post
+    data.items.forEach(post => {
+      const title = post.fields.title || "Untitled Post";
+
+      // Video (optional)
+      let videoHTML = "";
+      if (post.fields.video && assets[post.fields.video.sys.id]) {
+        videoHTML = `
+          <video controls width="100%">
+            <source src="https:${assets[post.fields.video.sys.id]}" type="video/mp4">
+          </video>
+        `;
+      }
+
+      container.innerHTML += `
+        <div class="blog-post">
+          <h2>${title}</h2>
+          ${videoHTML}
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Failed to load posts.</p>";
+  }
+}
+
+loadBlog();
 
 </script>
